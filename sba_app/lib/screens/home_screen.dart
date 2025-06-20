@@ -3,7 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'budget_tracker_screen.dart';
 import 'analytics_screen.dart';
 import 'chatbot.dart';
-import 'gamification.dart'; // Import gamification screen
+import 'gamification.dart';
+import 'welcome.dart'; // Import welcome screen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _biometricEnabled = false;
   bool _darkModeEnabled = true;
 
-  // Enhanced menu items with gamification
+  // Enhanced menu items with sign out
   final List<Map<String, dynamic>> _menuItems = [
     {
       'icon': FontAwesomeIcons.robot,
@@ -57,6 +58,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'title': 'Profile',
       'gradient': [Colors.deepPurple, Colors.teal],
     },
+    {
+      'icon': FontAwesomeIcons.signOutAlt,
+      'title': 'Sign Out',
+      'gradient': [Colors.red, Colors.redAccent],
+    },
   ];
 
   @override
@@ -78,17 +84,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _showQuickAction() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Quick action triggered!'),
-        backgroundColor: Colors.teal,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
   void _navigateToChatbot() {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatbotScreen()));
   }
@@ -105,16 +100,96 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const GamificationScreen()));
   }
 
+  void _showSignOutDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[800],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.signOutAlt,
+                color: Colors.red,
+                size: 24,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Sign Out',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Are you sure you want to sign out? You will need to log in again to access your account.',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                _signOut(); // Perform sign out
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _signOut() {
+    // Clear any stored user data or authentication tokens here
+    // For example: SharedPreferences, secure storage, etc.
+    
+    // Navigate back to welcome screen and clear navigation stack
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[850],
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showQuickAction,
-        backgroundColor: Colors.teal,
-        icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
-        label: const Text('Quick Add', style: TextStyle(color: Colors.white)),
-      ),
       bottomNavigationBar: _buildBottomNavigationBar(),
       body: Row(
         children: [
@@ -171,6 +246,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     itemBuilder: (context, index) {
                       final item = _menuItems[index];
                       final isSelected = _selectedIndex == index;
+                      final isSignOut = index == _menuItems.length - 1; // Last item is sign out
+                      
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         child: Container(
@@ -184,30 +261,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: ListTile(
                             leading: FaIcon(
                               item['icon'],
-                              color: isSelected ? Colors.white : Colors.white70,
+                              color: isSelected ? Colors.white : (isSignOut ? Colors.red[300] : Colors.white70),
                               size: 18,
                             ),
                             title: _isSidebarExpanded
                                 ? Text(
                                     item['title'],
                                     style: TextStyle(
-                                      color: isSelected ? Colors.white : Colors.white70,
+                                      color: isSelected ? Colors.white : (isSignOut ? Colors.red[300] : Colors.white70),
                                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                       fontSize: 14,
                                     ),
                                   )
                                 : null,
                             onTap: () {
-                              setState(() {
-                                _selectedIndex = index;
-                              });
-                              
-                              switch (index) {
-                                case 0: _navigateToChatbot(); break;
-                                case 1: _navigateToBudgetTracker(); break;
-                                case 2: _navigateToAnalytics(); break;
-                                case 3: _navigateToGamification(); break;
-                                default: break;
+                              if (isSignOut) {
+                                _showSignOutDialog();
+                              } else {
+                                setState(() {
+                                  _selectedIndex = index;
+                                });
+                                
+                                switch (index) {
+                                  case 0: _navigateToChatbot(); break;
+                                  case 1: _navigateToBudgetTracker(); break;
+                                  case 2: _navigateToAnalytics(); break;
+                                  case 3: _navigateToGamification(); break;
+                                  default: break;
+                                }
                               }
                             },
                           ),
