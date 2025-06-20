@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'budget_tracker_screen.dart';
+import 'analytics_screen.dart';
+import 'chatbot.dart';
+import 'gamification.dart'; // Import gamification screen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,72 +19,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
-  // User data - in a real app, this would come from a database/API
-  Map<String, String> _userData = {
-    'name': 'Alex Johnson',
-    'email': 'alex.johnson@email.com',
-    'phone': '+1 (555) 123-4567',
-    'location': 'San Francisco, CA',
-    'joinDate': 'January 2024',
-  };
+  // User data - these should be linked to actual budget tracker data
+  String _userName = 'Alex Johnson';
+  String _userEmail = 'alex.johnson@email.com';
+  double _currentBalance = 12450.00; // Link this to budget_tracker_screen
+  double _monthlyExpenses = 2340.00; // Link this to budget_tracker_screen
+  
+  // Settings
+  bool _notificationsEnabled = true;
+  bool _biometricEnabled = false;
+  bool _darkModeEnabled = true;
 
+  // Enhanced menu items with gamification
   final List<Map<String, dynamic>> _menuItems = [
     {
       'icon': FontAwesomeIcons.robot,
       'title': 'AI Assistant',
-      'gradient': [Color(0xFF667eea), Color(0xFF764ba2)],
-    },
-    {
-      'icon': FontAwesomeIcons.chartLine,
-      'title': 'Analytics',
-      'gradient': [Color(0xFF11998e), Color(0xFF38ef7d)],
+      'gradient': [Colors.blue, Colors.indigo],
     },
     {
       'icon': FontAwesomeIcons.wallet,
       'title': 'Budget Tracker',
-      'gradient': [Color(0xFFf093fb), Color(0xFFf5576c)],
+      'gradient': [Colors.purple, Colors.pink],
     },
     {
-      'icon': FontAwesomeIcons.coins,
-      'title': 'Investments',
-      'gradient': [Color(0xFF4facfe), Color(0xFF00f2fe)],
+      'icon': FontAwesomeIcons.chartLine,
+      'title': 'Analytics',
+      'gradient': [Colors.teal, Colors.green],
     },
     {
-      'icon': FontAwesomeIcons.bell,
-      'title': 'Smart Alerts',
-      'gradient': [Color(0xFFfa709a), Color(0xFFfee140)],
+      'icon': FontAwesomeIcons.gamepad,
+      'title': 'Gamification',
+      'gradient': [Colors.orange, Colors.red],
     },
     {
       'icon': FontAwesomeIcons.user,
       'title': 'Profile',
-      'gradient': [Color(0xFF8360c3), Color(0xFF2ebf91)],
+      'gradient': [Colors.deepPurple, Colors.teal],
     },
-  ];
-
-  final List<BottomNavigationBarItem> _bottomNavItems = [
-    BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.house, size: 20),
-      label: 'Home',
-    ),
-    BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.chartLine, size: 20),
-      label: 'Analytics',
-    ),
-    BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.wallet, size: 20),
-      label: 'Wallet',
-    ),
-    BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.user, size: 20),
-      label: 'Profile',
-    ),
   ];
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -95,260 +78,92 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1a1f3a),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Text(
-            'Logout',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'Are you sure you want to logout?',
-            style: TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _performLogout();
-                },
-                child: const Text('Logout', style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _performLogout() {
-    // In a real app, you would clear user session, tokens, etc.
+  void _showQuickAction() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Logged out successfully'),
-        backgroundColor: const Color(0xFF11998e),
+        content: const Text('Quick action triggered!'),
+        backgroundColor: Colors.teal,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
-    // Navigate to login screen
-    // Navigator.of(context).pushReplacementNamed('/login');
   }
 
-  void _showEditProfileDialog() {
-    final TextEditingController nameController = TextEditingController(text: _userData['name']);
-    final TextEditingController emailController = TextEditingController(text: _userData['email']);
-    final TextEditingController phoneController = TextEditingController(text: _userData['phone']);
-    final TextEditingController locationController = TextEditingController(text: _userData['location']);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1a1f3a),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Text(
-            'Edit Profile',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildEditField('Name', nameController),
-                const SizedBox(height: 15),
-                _buildEditField('Email', emailController),
-                const SizedBox(height: 15),
-                _buildEditField('Phone', phoneController),
-                const SizedBox(height: 15),
-                _buildEditField('Location', locationController),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    _userData['name'] = nameController.text;
-                    _userData['email'] = emailController.text;
-                    _userData['phone'] = phoneController.text;
-                    _userData['location'] = locationController.text;
-                  });
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Profile updated successfully'),
-                      backgroundColor: const Color(0xFF11998e),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                  );
-                },
-                child: const Text('Save', style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+  void _navigateToChatbot() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatbotScreen()));
   }
 
-  Widget _buildEditField(String label, TextEditingController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 14),
-        ),
-        const SizedBox(height: 5),
-        TextField(
-          controller: controller,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF11998e), width: 2),
-            ),
-          ),
-        ),
-      ],
-    );
+  void _navigateToBudgetTracker() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const BudgetTrackerScreen()));
+  }
+
+  void _navigateToAnalytics() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalyticsScreen()));
+  }
+
+  void _navigateToGamification() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const GamificationScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0a0e21),
+      backgroundColor: Colors.grey[850],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showQuickAction,
+        backgroundColor: Colors.teal,
+        icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
+        label: const Text('Quick Add', style: TextStyle(color: Colors.white)),
+      ),
       bottomNavigationBar: _buildBottomNavigationBar(),
       body: Row(
         children: [
-          // Futuristic Sidebar Navigation
+          // Enhanced Sidebar
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: _isSidebarExpanded ? 280 : 80,
+            width: _isSidebarExpanded ? 250 : 70,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF1e3c72), Color(0xFF2a5298)],
+                colors: [Colors.blue[900]!, Colors.indigo[900]!],
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.blue.withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 5,
+                  blurRadius: 15,
+                  spreadRadius: 2,
                 )
               ],
             ),
             child: Column(
               children: [
-                // Futuristic Header
+                // Header
                 Container(
-                  height: 160,
+                  height: 120,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                    ),
+                    gradient: LinearGradient(colors: [Colors.blue, Colors.indigo]),
                     borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.purple.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
-                      )
-                    ],
                   ),
                   child: Center(
                     child: _isSidebarExpanded
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.account_balance_wallet,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Smart Budget',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Text(
-                                'AI Assistant',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                ),
-                              ),
+                              const Icon(Icons.account_balance_wallet, color: Colors.white, size: 28),
+                              const SizedBox(height: 8),
+                              const Text('Smart Budget', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                             ],
                           )
-                        : Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.account_balance_wallet,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
+                        : const Icon(Icons.account_balance_wallet, color: Colors.white, size: 28),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+                
                 // Menu Items
                 Expanded(
                   child: ListView.builder(
@@ -356,49 +171,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     itemBuilder: (context, index) {
                       final item = _menuItems[index];
                       final isSelected = _selectedIndex == index;
-                      
                       return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: isSelected
-                                ? LinearGradient(colors: item['gradient'])
-                                : null,
-                            borderRadius: BorderRadius.circular(15),
+                            gradient: isSelected ? LinearGradient(colors: item['gradient']) : null,
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isSelected 
-                                ? Colors.transparent 
-                                : Colors.white.withOpacity(0.1),
-                              width: 1,
+                              color: isSelected ? Colors.transparent : Colors.white.withOpacity(0.1),
                             ),
                           ),
                           child: ListTile(
                             leading: FaIcon(
                               item['icon'],
                               color: isSelected ? Colors.white : Colors.white70,
-                              size: 20,
+                              size: 18,
                             ),
                             title: _isSidebarExpanded
                                 ? Text(
                                     item['title'],
                                     style: TextStyle(
                                       color: isSelected ? Colors.white : Colors.white70,
-                                      fontWeight: isSelected
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                       fontSize: 14,
                                     ),
                                   )
                                 : null,
-                            minLeadingWidth: 20,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
                             onTap: () {
                               setState(() {
                                 _selectedIndex = index;
                               });
+                              
+                              switch (index) {
+                                case 0: _navigateToChatbot(); break;
+                                case 1: _navigateToBudgetTracker(); break;
+                                case 2: _navigateToAnalytics(); break;
+                                case 3: _navigateToGamification(); break;
+                                default: break;
+                              }
                             },
                           ),
                         ),
@@ -406,50 +216,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     },
                   ),
                 ),
-                // Logout Button
+                
+                // Toggle Button
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: ListTile(
-                    leading: const FaIcon(
-                      FontAwesomeIcons.signOutAlt,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    title: _isSidebarExpanded
-                        ? const Text(
-                            'Logout',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          )
-                        : null,
-                    minLeadingWidth: 20,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    onTap: _showLogoutDialog,
-                  ),
-                ),
-                // Collapse/Expand Button
-                Container(
-                  margin: const EdgeInsets.all(15),
+                  margin: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconButton(
                     icon: Icon(
-                      _isSidebarExpanded
-                          ? Icons.arrow_back_ios
-                          : Icons.arrow_forward_ios,
+                      _isSidebarExpanded ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
                       color: Colors.white70,
                     ),
                     onPressed: () {
@@ -462,12 +239,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
+          
           // Main Content Area
           Expanded(
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: Container(
-                padding: const EdgeInsets.all(30),
+                padding: const EdgeInsets.all(25),
                 child: _buildMainContent(),
               ),
             ),
@@ -480,14 +258,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1e3c72), Color(0xFF2a5298)],
-        ),
+        gradient: LinearGradient(colors: [Colors.blue[800]!, Colors.indigo[800]!]),
         boxShadow: [
           BoxShadow(
             color: Colors.blue.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           )
         ],
       ),
@@ -496,42 +272,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onTap: (index) {
           setState(() {
             _bottomNavIndex = index;
-            _selectedIndex = index;
+            _selectedIndex = index == 0 ? 1 : (index == 1 ? 2 : 0); // Map to sidebar items
           });
+          
+          switch (index) {
+            case 0: _navigateToBudgetTracker(); break;
+            case 1: _navigateToAnalytics(); break;
+            case 2: _navigateToChatbot(); break;
+          }
         },
         backgroundColor: Colors.transparent,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF38ef7d),
-        unselectedItemColor: Colors.white70,
         elevation: 0,
-        items: _bottomNavItems,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white60,
+        items: const [
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.wallet, size: 20),
+            label: 'Budget',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.chartLine, size: 20),
+            label: 'Analytics',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.robot, size: 20),
+            label: 'AI Assistant',
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildMainContent() {
-    if (_selectedIndex == 5) { // Profile tab
-      return _buildProfileView();
+    if (_selectedIndex == 4) { // Profile tab
+      return _buildEnhancedProfileView();
     }
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header Section
         _buildHeader(),
-        const SizedBox(height: 30),
-        
-        // Financial Overview Cards
+        const SizedBox(height: 25),
         _buildFinancialOverview(),
-        const SizedBox(height: 30),
-        
-        // Main Dashboard Grid
+        const SizedBox(height: 25),
         Expanded(child: _buildDashboardGrid()),
       ],
     );
   }
 
-  Widget _buildProfileView() {
+  Widget _buildEnhancedProfileView() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,9 +330,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF8360c3), Color(0xFF2ebf91)],
-              ),
+              gradient: LinearGradient(colors: [Colors.deepPurple, Colors.teal]),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -554,19 +342,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+                Stack(
+                  children: [
+                    const CircleAvatar(
+                      backgroundImage: NetworkImage('https://randomuser.me/api/portraits/men/32.jpg'),
+                      radius: 40,
                     ),
-                  ),
-                  child: const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://randomuser.me/api/portraits/men/32.jpg'),
-                    radius: 40,
-                  ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.teal,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.edit, color: Colors.white, size: 16),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -574,120 +368,190 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _userData['name']!,
+                        _userName,
                         style: const TextStyle(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 5),
                       Text(
-                        'Member since ${_userData['joinDate']}',
+                        _userEmail,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'Premium Member',
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: IconButton(
-                    onPressed: _showEditProfileDialog,
-                    icon: const Icon(Icons.edit, color: Colors.white),
-                  ),
-                ),
               ],
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
           
-          // Profile Information Cards
-          _buildProfileInfoCard('Contact Information', [
-            {'icon': Icons.email, 'label': 'Email', 'value': _userData['email']!},
-            {'icon': Icons.phone, 'label': 'Phone', 'value': _userData['phone']!},
-            {'icon': Icons.location_on, 'label': 'Location', 'value': _userData['location']!},
-          ]),
-          const SizedBox(height: 20),
+          // Quick Stats with linked data
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard('Current Balance', '\$${_currentBalance.toStringAsFixed(2)}', Icons.account_balance_wallet, Colors.teal),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: _buildStatCard('Monthly Expenses', '\$${_monthlyExpenses.toStringAsFixed(2)}', Icons.trending_down, Colors.purple),
+              ),
+            ],
+          ),
+          const SizedBox(height: 25),
           
-          _buildProfileInfoCard('Account Settings', [
-            {'icon': Icons.security, 'label': 'Security', 'value': 'Change Password'},
-            {'icon': Icons.notifications, 'label': 'Notifications', 'value': 'Manage Preferences'},
-            {'icon': Icons.privacy_tip, 'label': 'Privacy', 'value': 'Privacy Settings'},
-          ]),
+          // Settings Section
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Settings & Preferences',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                _buildSettingsTile('Notifications', 'Manage your alerts and reminders', Icons.notifications, _notificationsEnabled, (value) {
+                  setState(() {
+                    _notificationsEnabled = value;
+                  });
+                }),
+                _buildSettingsTile('Biometric Security', 'Enable fingerprint/face unlock', Icons.fingerprint, _biometricEnabled, (value) {
+                  setState(() {
+                    _biometricEnabled = value;
+                  });
+                }),
+                _buildSettingsTile('Dark Mode', 'Toggle dark/light theme', Icons.dark_mode, _darkModeEnabled, (value) {
+                  setState(() {
+                    _darkModeEnabled = value;
+                  });
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          
+          // Security Controls
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Security Controls',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 15),
+                _buildActionTile('Change Password', 'Update your account password', Icons.lock, () {}),
+                _buildActionTile('Privacy Settings', 'Manage data sharing preferences', Icons.privacy_tip, () {}),
+                _buildActionTile('Export Data', 'Download your financial data', Icons.download, () {}),
+                _buildActionTile('Delete Account', 'Permanently delete your account', Icons.delete_forever, () {}, isDestructive: true),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildProfileInfoCard(String title, List<Map<String, dynamic>> items) {
+  Widget _buildSettingsTile(String title, String subtitle, IconData icon, bool value, Function(bool) onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white70, size: 24),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: Colors.teal,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile(String title, String subtitle, IconData icon, VoidCallback onTap, {bool isDestructive = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Icon(icon, color: isDestructive ? Colors.red : Colors.white70, size: 24),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: TextStyle(color: isDestructive ? Colors.red : Colors.white, fontSize: 16)),
+                    Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.5), size: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1a1f3a),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          )
-        ],
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 20),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: Row(
-              children: [
-                Icon(item['icon'], color: Colors.white70, size: 20),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['label'],
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Text(
-                        item['value'],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 12),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
         ],
       ),
     );
@@ -697,13 +561,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-        ),
+        gradient: LinearGradient(colors: [Colors.blue, Colors.indigo]),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.purple.withOpacity(0.3),
+            color: Colors.blue.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 5),
           )
@@ -716,36 +578,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome back, ${_userData['name']!.split(' ')[0]}!',
+                'Welcome back, ${_userName.split(' ')[0]}!',
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Text(
-                'Your financial AI is ready to assist',
+                'Your financial dashboard',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.white.withOpacity(0.8),
                 ),
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
-              ),
-            ),
-            child: const CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://randomuser.me/api/portraits/men/32.jpg'),
-              radius: 30,
-            ),
+          const CircleAvatar(
+            backgroundImage: NetworkImage('https://randomuser.me/api/portraits/men/32.jpg'),
+            radius: 25,
           ),
         ],
       ),
@@ -757,42 +609,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       children: [
         Expanded(
           child: _buildOverviewCard(
-            'Total Balance',
-            '\$12,450.00',
+            'Balance',
+            '\$${_currentBalance.toStringAsFixed(2)}',
             '+2.5%',
             Icons.account_balance_wallet,
-            [Color(0xFF11998e), Color(0xFF38ef7d)],
-            true,
+            [Colors.teal, Colors.green],
           ),
         ),
         const SizedBox(width: 20),
         Expanded(
           child: _buildOverviewCard(
-            'Monthly Spending',
-            '\$2,340.00',
+            'Expenses',
+            '\$${_monthlyExpenses.toStringAsFixed(2)}',
             '-8.2%',
             Icons.trending_down,
-            [Color(0xFFf093fb), Color(0xFFf5576c)],
-            false,
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(
-          child: _buildOverviewCard(
-            'Savings Goal',
-            '68%',
-            '+12%',
-            Icons.savings,
-            [Color(0xFF4facfe), Color(0xFF00f2fe)],
-            true,
+            [Colors.purple, Colors.pink],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildOverviewCard(String title, String value, String change,
-      IconData icon, List<Color> gradient, bool isPositive) {
+  Widget _buildOverviewCard(String title, String value, String change, IconData icon, List<Color> gradient) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -801,8 +639,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         boxShadow: [
           BoxShadow(
             color: gradient.first.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           )
         ],
       ),
@@ -812,137 +650,82 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: Colors.white, size: 24),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  change,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              Icon(icon, color: Colors.white, size: 22),
+              Text(change, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
             ],
           ),
-          const SizedBox(height: 15),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
-            ),
-          ),
+          const SizedBox(height: 12),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
         ],
       ),
     );
   }
 
   Widget _buildDashboardGrid() {
+    final features = [
+      {'title': 'AI Insights', 'subtitle': 'Smart recommendations', 'icon': FontAwesomeIcons.brain, 'colors': [Colors.blue, Colors.indigo]},
+      {'title': 'Expense Tracking', 'subtitle': 'Track your spending', 'icon': FontAwesomeIcons.receipt, 'colors': [Colors.purple, Colors.pink]},
+      {'title': 'Budget Planner', 'subtitle': 'Plan your finances', 'icon': FontAwesomeIcons.calculator, 'colors': [Colors.teal, Colors.green]},
+      {'title': 'Gamification', 'subtitle': 'Achieve financial goals', 'icon': FontAwesomeIcons.gamepad, 'colors': [Colors.orange, Colors.red]},
+    ];
+
     return GridView.count(
-      crossAxisCount: 3,
-      childAspectRatio: 1.2,
-      crossAxisSpacing: 20,
-      mainAxisSpacing: 20,
-      children: [
-        _buildFeatureCard(
-          'AI Insights',
-          'Get personalized recommendations',
-          FontAwesomeIcons.brain,
-          [Color(0xFF667eea), Color(0xFF764ba2)],
-        ),
-        _buildFeatureCard(
-          'Expense Tracking',
-          'Smart categorization & analysis',
-          FontAwesomeIcons.receipt,
-          [Color(0xFFf093fb), Color(0xFFf5576c)],
-        ),
-        _buildFeatureCard(
-          'Investment Hub',
-          'Portfolio tracking & insights',
-          FontAwesomeIcons.chartLine,
-          [Color(0xFF4facfe), Color(0xFF00f2fe)],
-        ),
-        _buildFeatureCard(
-          'Budget Planner',
-          'Create & monitor budgets',
-          FontAwesomeIcons.calculator,
-          [Color(0xFF11998e), Color(0xFF38ef7d)],
-        ),
-        _buildFeatureCard(
-          'Financial Goals',
-          'Track your progress',
-          FontAwesomeIcons.bullseye,
-          [Color(0xFFfa709a), Color(0xFFfee140)],
-        ),
-        _buildFeatureCard(
-          'Reports',
-          'Detailed financial analytics',
-          FontAwesomeIcons.fileAlt,
-          [Color(0xFF8360c3), Color(0xFF2ebf91)],
-        ),
-      ],
+      crossAxisCount: 2,
+      childAspectRatio: 1.3,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
+      children: features.map((feature) => _buildFeatureCard(
+        feature['title'] as String,
+        feature['subtitle'] as String,
+        feature['icon'] as IconData,
+        feature['colors'] as List<Color>,
+      )).toList(),
     );
   }
 
   Widget _buildFeatureCard(String title, String subtitle, IconData icon, List<Color> gradient) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1a1f3a),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           )
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: gradient),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: FaIcon(icon, color: Colors.white, size: 24),
+              child: FaIcon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 12),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.white.withOpacity(0.7),
               ),
             ),
